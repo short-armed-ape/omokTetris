@@ -12,13 +12,26 @@
             background-color: #333;
             color: white;
             text-align: center;
-            padding: 20px;
-            height: 100vh;
+            padding: 10px;
             box-sizing: border-box;
         }
-        .container {
-            max-width: 600px;
+        .game-container {
+            max-width: 900px;
             margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .game-board {
+            flex: 0 0 450px;
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+        .game-info {
+            flex: 0 0 400px;
+            padding: 0 15px;
+            text-align: left;
+            margin-bottom: 20px;
         }
         canvas {
             background-color: #505050;
@@ -31,6 +44,7 @@
         .controls {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 10px;
             margin: 15px 0;
         }
@@ -42,6 +56,21 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 1em;
+        }
+        button:hover {
+            background-color: #0055aa;
+        }
+        .pause-btn {
+            background-color: #f29107;
+        }
+        .pause-btn:hover {
+            background-color: #d97f00;
+        }
+        .exit-btn {
+            background-color: #d93025;
+        }
+        .exit-btn:hover {
+            background-color: #b7271e;
         }
         .mobile-controls {
             margin: 15px auto;
@@ -68,8 +97,7 @@
             background-color: #444;
             padding: 15px;
             border-radius: 5px;
-            margin: 20px 0;
-            text-align: left;
+            margin: 15px 0;
         }
         .credits {
             margin-bottom: 15px;
@@ -81,48 +109,100 @@
         .credits a:hover {
             text-decoration: underline;
         }
+        .result-display {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 100;
+            text-align: center;
+        }
+        .result-display h2 {
+            margin-top: 0;
+        }
+        .result-display button {
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 900px) {
+            .game-container {
+                flex-direction: column;
+            }
+            .game-board, .game-info {
+                flex: 0 0 100%;
+            }
+            .game-info {
+                order: 2;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Omok + Tetris</h1>
-        <div class="credits">
-            <p>만든이: macho(endplan) | <a href="https://www.youtube.com/@endplan" target="_blank">YouTube 채널</a></p>
-        </div>
-        <canvas id="gameCanvas" width="450" height="600"></canvas>
-        <div id="status" style="margin: 15px 0; height: 30px;">Player 1's Turn</div>
-        <div class="controls">
-            <button id="restartBtn">Restart Game</button>
+    <div class="game-container">
+        <div class="game-board">
+            <h1>Omok + Tetris</h1>
+            <div class="credits">
+                <p>만든이: macho(endplan) | <a href="https://www.youtube.com/@endplan" target="_blank">YouTube 채널</a></p>
+            </div>
+            <canvas id="gameCanvas" width="450" height="600"></canvas>
+            <div id="status" style="margin: 15px 0; height: 30px;">Player 1's Turn</div>
+            <div class="controls">
+                <button id="restartBtn">Restart Game</button>
+                <button id="pauseBtn" class="pause-btn">Pause</button>
+                <button id="exitBtn" class="exit-btn">Exit Game</button>
+            </div>
+            
+            <div id="mobileControls" class="mobile-controls">
+                <div class="mobile-row">
+                    <button id="rotateBtn" class="mobile-btn">↻</button>
+                </div>
+                <div class="mobile-row">
+                    <button id="leftBtn" class="mobile-btn">←</button>
+                    <button id="downBtn" class="mobile-btn">↓</button>
+                    <button id="rightBtn" class="mobile-btn">→</button>
+                </div>
+                <div class="mobile-row">
+                    <button id="dropBtn" class="mobile-btn">⬇⬇</button>
+                </div>
+            </div>
         </div>
         
-        <div id="mobileControls" class="mobile-controls">
-            <div class="mobile-row">
-                <button id="rotateBtn" class="mobile-btn">↻</button>
-            </div>
-            <div class="mobile-row">
-                <button id="leftBtn" class="mobile-btn">←</button>
-                <button id="downBtn" class="mobile-btn">↓</button>
-                <button id="rightBtn" class="mobile-btn">→</button>
-            </div>
-            <div class="mobile-row">
-                <button id="dropBtn" class="mobile-btn">⬇⬇</button>
+        <div class="game-info">
+            <div class="info">
+                <h3>How to Play:</h3>
+                <p>This game combines Omok (Five in a Row) with Tetris mechanics.</p>
+                <p><strong>Player 1 (Blue):</strong> Control tetromino blocks using keyboard or touch.</p>
+                <ul>
+                    <li>← → keys: Move left/right</li>
+                    <li>↑ key: Rotate</li>
+                    <li>↓ key: Move down</li>
+                    <li>Space: Hard drop</li>
+                </ul>
+                <p><strong>Player 2 (White):</strong> AI opponent</p>
+                <p><strong>Win Conditions:</strong> Connect exactly five stones in a row horizontally, vertically, or diagonally.</p>
+                <p>Clearing a full row will remove it, just like in Tetris!</p>
+                
+                <h3>Mobile Controls:</h3>
+                <p>On mobile devices, touch controls will appear below the game:</p>
+                <ul>
+                    <li>↻ button: Rotate piece</li>
+                    <li>← → buttons: Move left/right</li>
+                    <li>↓ button: Move down</li>
+                    <li>⬇⬇ button: Hard drop</li>
+                </ul>
             </div>
         </div>
-        
-        <div class="info">
-            <h3>How to Play:</h3>
-            <p>This game combines Omok (Five in a Row) with Tetris mechanics.</p>
-            <p><strong>Player 1 (Blue):</strong> Control tetromino blocks using keyboard or touch.</p>
-            <ul>
-                <li>← → keys: Move left/right</li>
-                <li>↑ key: Rotate</li>
-                <li>↓ key: Move down</li>
-                <li>Space: Hard drop</li>
-            </ul>
-            <p><strong>Player 2 (White):</strong> AI opponent</p>
-            <p><strong>Win Conditions:</strong> Connect exactly five stones in a row horizontally, vertically, or diagonally.</p>
-            <p>Clearing a full row will remove it, just like in Tetris!</p>
-        </div>
+    </div>
+    
+    <div id="resultDisplay" class="result-display">
+        <h2 id="resultText">Player 1 Wins!</h2>
+        <p id="resultDescription">You successfully connected 5 stones in a row!</p>
+        <button id="closeResultBtn">Continue</button>
     </div>
 
     <script>
@@ -144,6 +224,10 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const statusText = document.getElementById('status');
+    const resultDisplay = document.getElementById('resultDisplay');
+    const resultText = document.getElementById('resultText');
+    const resultDescription = document.getElementById('resultDescription');
+    const closeResultBtn = document.getElementById('closeResultBtn');
 
     // Tetromino shapes
     const SHAPES = {
@@ -363,6 +447,7 @@
             this.fallSpeed = 500; // ms
             this.lastTime = 0;
             this.active = true;
+            this.paused = false;
             
             this.spawnTetromino();
         }
@@ -375,9 +460,11 @@
             this.winner = null;
             this.fallTime = 0;
             this.active = true;
+            this.paused = false;
             
             this.spawnTetromino();
             statusText.textContent = "Player 1's Turn";
+            document.getElementById('pauseBtn').textContent = "Pause";
         }
         
         spawnTetromino() {
@@ -388,11 +475,12 @@
             if (this.currentTetromino.collides(this.currentTetromino.x, this.currentTetromino.y, this.currentTetromino.rotation)) {
                 this.gameOver = true;
                 this.winner = null;
+                this.showGameOver("Game Over", "The board is full! It's a draw!");
             }
         }
         
         update() {
-            if (this.gameOver || !this.active) return;
+            if (this.gameOver || !this.active || this.paused) return;
             
             if (!this.currentTetromino.move(0, 1)) {
                 this.grid.placeStones(this.currentTetromino.getBlocks(), this.currentPlayer);
@@ -400,7 +488,12 @@
                 if (this.grid.checkFiveInARow(this.currentPlayer)) {
                     this.gameOver = true;
                     this.winner = this.currentPlayer;
-                    this.showGameOver();
+                    
+                    if (this.winner === 1) {
+                        this.showGameOver("Player 1 Wins!", "You successfully connected 5 stones in a row!");
+                    } else {
+                        this.showGameOver("AI Wins!", "The AI successfully connected 5 stones in a row!");
+                    }
                 } else {
                     this.grid.clearFullRows();
                     this.currentPlayer = 3 - this.currentPlayer; // Switch player
@@ -408,7 +501,7 @@
                     this.spawnTetromino();
                     
                     // AI turn
-                    if (this.currentPlayer === 2 && this.active) {
+                    if (this.currentPlayer === 2 && this.active && !this.paused) {
                         setTimeout(() => this.aiMove(), 300);
                     }
                 }
@@ -416,13 +509,13 @@
         }
         
         aiMove() {
-            if (this.gameOver || !this.active) return;
+            if (this.gameOver || !this.active || this.paused) return;
             
             // Simple AI
             const maxAttempts = 10;
             let moved = false;
             
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            for (let attempt = A; attempt < maxAttempts; attempt++) {
                 // Random rotation
                 const rotations = Math.floor(Math.random() * SHAPES[this.currentTetromino.shape].length);
                 for (let r = 0; r < rotations; r++) {
@@ -450,7 +543,7 @@
         }
         
         handleKeyPress(key) {
-            if (this.gameOver || this.currentPlayer !== 1 || !this.active) return;
+            if (this.gameOver || this.currentPlayer !== 1 || !this.active || this.paused) return;
             
             switch (key) {
                 case 'ArrowLeft':
@@ -471,6 +564,41 @@
                     }
                     this.update();
                     break;
+                case 'p': // Pause
+                case 'P':
+                    this.togglePause();
+                    break;
+            }
+        }
+        
+        togglePause() {
+            this.paused = !this.paused;
+            
+            if (this.paused) {
+                statusText.textContent = "Game Paused";
+                document.getElementById('pauseBtn').textContent = "Resume";
+            } else {
+                statusText.textContent = `Player ${this.currentPlayer}'s Turn`;
+                document.getElementById('pauseBtn').textContent = "Pause";
+                
+                // If it's AI's turn when resuming, trigger AI move
+                if (this.currentPlayer === 2) {
+                    setTimeout(() => this.aiMove(), 300);
+                }
+            }
+        }
+        
+        exitGame() {
+            if (confirm("Are you sure you want to exit the game?")) {
+                this.active = false;
+                this.gameOver = true;
+                statusText.textContent = "Game Exited";
+                
+                // You could redirect to another page or perform other exit actions here
+                // For now, we'll just reload the page
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             }
         }
         
@@ -481,16 +609,31 @@
             
             this.grid.draw();
             
-            if (this.currentTetromino) {
+            if (this.currentTetromino && !this.paused) {
                 this.currentTetromino.draw();
+            }
+            
+            // Draw pause overlay
+            if (this.paused) {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = "white";
+                ctx.font = "30px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
             }
         }
         
         gameLoop(timestamp) {
+            if (!this.lastTime) {
+                this.lastTime = timestamp;
+            }
+            
             const deltaTime = timestamp - this.lastTime;
             this.lastTime = timestamp;
             
-            if (!this.gameOver && this.active) {
+            if (!this.gameOver && this.active && !this.paused) {
                 if (this.currentPlayer === 1) {
                     this.fallTime += deltaTime;
                     if (this.fallTime >= this.fallSpeed) {
@@ -504,14 +647,11 @@
             requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
         }
         
-        showGameOver() {
-            if (this.winner) {
-                statusText.textContent = `Player ${this.winner} Wins!`;
-            } else {
-                statusText.textContent = "Game Over - Draw!";
-            }
-            
-            setTimeout(() => this.restart(), 3000);
+        showGameOver(title, description) {
+            resultText.textContent = title;
+            resultDescription.textContent = description;
+            resultDisplay.style.display = "block";
+            statusText.textContent = title;
         }
     }
 
@@ -523,13 +663,27 @@
 
     // Event Listeners
     window.addEventListener('keydown', (e) => {
-        if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', ' '].includes(e.key)) {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', ' ', 'p', 'P'].includes(e.key)) {
             e.preventDefault();
             game.handleKeyPress(e.key);
         }
     });
 
     document.getElementById('restartBtn').addEventListener('click', () => {
+        game.restart();
+        resultDisplay.style.display = "none";
+    });
+    
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+        game.togglePause();
+    });
+    
+    document.getElementById('exitBtn').addEventListener('click', () => {
+        game.exitGame();
+    });
+    
+    closeResultBtn.addEventListener('click', () => {
+        resultDisplay.style.display = "none";
         game.restart();
     });
 
